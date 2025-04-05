@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import { submitVerification } from "../services/api";
 
 interface VerificationContextType {
@@ -53,7 +53,7 @@ export function VerificationProvider({ children }: VerificationProviderProps) {
       setIsVerifying(true);
       setError(null);
 
-      await submitVerification(proof, telegramId, groupId || undefined);
+      await submitVerification(proof, "worldguard-verification", "1234567890_987654321");
 
       setIsVerified(true);
       setIsVerifying(false);
