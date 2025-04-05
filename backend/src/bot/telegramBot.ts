@@ -69,13 +69,21 @@ export function startBot() {
                 [
                   {
                     text: "🌎 Verify with World ID",
-                    url: `https://worldcoin.org/mini-app?app_id=app_e9ff38ec52182a86a2101509db66c179&action=${encodeURIComponent(
-                      "worldguard-verification"
-                    )}&signal=${encodeURIComponent(
-                      userId.toString()
-                    )}&redirect_url=${encodeURIComponent(
-                      `https://t.me/worldguard_bot?start=verify_${chatId}_${userId}`
-                    )}`,
+                    url: (() => {
+                      // Create the signal in the requested format
+                      const signal = `${userId}_${chatId}`;
+
+                      // Create a path with all parameters
+                      let path = `?action=worldguard-verification&signal=${signal}&redirect_url=${encodeURIComponent(
+                        `https://t.me/world_guard_bot?start=verify_${chatId}_${userId}`
+                      )}`;
+
+                      // Encode the entire path
+                      const encodedPath = encodeURIComponent(path);
+
+                      // Construct the final URL
+                      return `https://worldcoin.org/mini-app?app_id=app_e9ff38ec52182a86a2101509db66c179&path=${encodedPath}`;
+                    })(),
                   },
                 ],
               ],
