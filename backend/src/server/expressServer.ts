@@ -28,6 +28,8 @@ export function startServer(port: number) {
   app.post("/api/verify", function (req, res) {
     const { payload, action, signal } = req.body;
 
+    console.log("Received verification request:", req.body);
+
     if (!payload || !action || !signal) {
       return res.status(400).json({
         success: false,

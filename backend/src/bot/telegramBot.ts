@@ -183,8 +183,7 @@ async function handleVerificationTimeout(chatId: number, userId: number) {
 
     // Kick user from the group (using banChatMember which replaced kickChatMember)
     try {
-      // Set to 31 seconds to avoid the "less than 30 seconds" case that causes permanent bans
-      const unbanDate = Math.floor(Date.now() / 1000) + 40;
+      const unbanDate = Math.floor(Date.now() / 1000) + 65;
 
       await bot.banChatMember(chatId, userId, {
         until_date: unbanDate, // Ban for 31 seconds (must be > 30 to not be permanent)
