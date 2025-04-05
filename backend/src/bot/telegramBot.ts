@@ -11,7 +11,44 @@ const VERIFICATION_TIMEOUT_MS = parseInt(
 );
 
 // Create a bot instance
-const bot = new TelegramBot(token, { polling: true });
+const bot = new TelegramBot(token, {
+  polling: {
+    params: {
+      allowed_updates: [
+        "message",
+        "edited_message",
+        "channel_post",
+        "edited_channel_post",
+        "callback_query",
+        "my_chat_member",
+        "chat_member",
+      ],
+    },
+  },
+});
+
+/**
+ * Helper function to format bot messages with consistent styling
+ */
+const formatBotMessage = (
+  title: string,
+  content: string,
+  buttons?: TelegramBot.InlineKeyboardButton[][]
+) => {
+  const message = `*${title}*\n\n${content}`;
+
+  const options: TelegramBot.SendMessageOptions = {
+    parse_mode: "Markdown",
+  };
+
+  if (buttons) {
+    options.reply_markup = {
+      inline_keyboard: buttons,
+    };
+  }
+
+  return { message, options };
+};
 
 /**
  * Initialize the Telegram bot
@@ -22,6 +59,22 @@ export function startBot() {
   }
 
   console.log("Starting Telegram bot...");
+
+  // Set up bot commands menu
+  bot
+    .setMyCommands([
+      {
+        command: "start",
+        description: "Start the bot and get usage instructions",
+      },
+      { command: "help", description: "Show help information" },
+    ])
+    .then(() => {
+      console.log("Bot commands menu set up successfully");
+    })
+    .catch((error) => {
+      console.error("Error setting up bot commands menu:", error);
+    });
 
   // Handle when a new member joins the chat
   bot.on("new_chat_members", async (msg) => {
@@ -57,38 +110,39 @@ export function startBot() {
         // Add user to verification queue
         stateManager.addUserToVerification(chatId, userId, username);
 
-        // Send verification message with button
-        const message = await bot.sendMessage(
-          chatId,
-          `Welcome @${
-            username || userId
-          }! To prevent spam, please verify you're human using World ID.`,
-          {
-            reply_markup: {
-              inline_keyboard: [
-                [
-                  {
-                    text: "🌎 Verify with World ID",
-                    url: (() => {
-                      // Create the signal in the requested format
-                      const signal = `${userId}_${chatId}`;
+        // Format welcome message with more information
+        const verificationContent =
+          `Welcome @${username || userId}!\n\n` +
+          "To prevent spam, please verify you're human using World ID.\n\n" +
+          "World ID is a digital passport that protects groups from bots while preserving your privacy. " +
+          "The verification takes just a few seconds.";
 
-                      // Create a path with all parameters
-                      let path = `?action=worldguard-verification&signal=${signal}`;
-                      // redirect_url: https://t.me/world_guard_bot?start=verify_1234567890_987654321
-                      // ?action=worldguard-verification&signal=1234567890_987654321
-                      // Encode the entire path
-                      const encodedPath = encodeURIComponent(path);
+        const verificationButtons = [
+          [
+            {
+              text: "🌎 Verify with World ID",
+              url: (() => {
+                // Create the signal in the requested format
+                const signal = `${userId}_${chatId}`;
 
-                      // Construct the final URL
-                      return `https://worldcoin.org/mini-app?app_id=app_e9ff38ec52182a86a2101509db66c179&path=${encodedPath}`;
-                    })(),
-                  },
-                ],
-              ],
+                // Create a path with all parameters
+                let path = `?action=worldguard-verification&signal=${signal}`;
+                // Encode the entire path
+                const encodedPath = encodeURIComponent(path);
+
+                // Construct the final URL
+                return `https://worldcoin.org/mini-app?app_id=app_e9ff38ec52182a86a2101509db66c179&path=${encodedPath}`;
+              })(),
             },
-          }
-        );
+          ],
+        ];
+
+        // Send verification message with button
+        const message = await bot.sendMessage(chatId, verificationContent, {
+          reply_markup: {
+            inline_keyboard: verificationButtons,
+          },
+        });
 
         // Store verification message ID for later cleanup
         stateManager.setVerificationMessageId(
@@ -146,6 +200,78 @@ export function startBot() {
       msg.chat.id,
       "Thanks for starting the verification process. Please complete it in the World ID app."
     );
+  });
+
+  // Handle basic /start command when users interact with the bot directly
+  bot.onText(/^\/start$/, async (msg) => {
+    const chatId = msg.chat.id;
+
+    // Get bot info to use the username in the add to group link
+    const botInfo = await bot.getMe();
+    const botUsername = botInfo.username;
+
+    const content =
+      "I help protect Telegram groups from spam and bots using World ID verification.\n\n" +
+      "🚀 *How to use me:*\n" +
+      "1. Add this bot to your existing group\n" +
+      "2. Make the bot an admin with these permissions:\n" +
+      "   - Delete messages\n" +
+      "   - Ban users\n" +
+      "   - Restrict members\n\n" +
+      "No additional setup needed - verification will take effect immediately!\n\n" +
+      "When new users join your group, they'll be asked to verify with World ID before they can chat.";
+
+    const buttons = [
+      [
+        {
+          text: "➕ Add to Group",
+          url: `https://t.me/${botUsername}?startgroup=start`,
+        },
+      ],
+      [
+        {
+          text: "📋 Learn About World ID",
+          url: "https://worldcoin.org/world-id",
+        },
+      ],
+    ];
+
+    const { message, options } = formatBotMessage(
+      "👋 Welcome to WorldGuard Bot!",
+      content,
+      buttons
+    );
+
+    // Send welcome message with instructions
+    bot.sendMessage(chatId, message, options);
+  });
+
+  // Handle /help command
+  bot.onText(/^\/help$/, (msg) => {
+    const chatId = msg.chat.id;
+
+    const content =
+      "*Commands:*\n" +
+      "- /start - Show welcome message\n" +
+      "- /help - Show this help message\n\n" +
+      "*Setup Instructions:*\n" +
+      "1. Add this bot to your group\n" +
+      "2. Make the bot an admin with these permissions:\n" +
+      "   - Delete messages\n" +
+      "   - Ban users\n" +
+      "   - Restrict members\n\n" +
+      "*How it Works:*\n" +
+      "When someone joins your group, they'll be asked to verify with World ID. If they don't verify within 3 minutes, they'll be removed automatically.\n\n" +
+      "Need more help? Contact us through the button below.";
+
+    const { message, options } = formatBotMessage(
+      "🛡️ WorldGuard Bot Help",
+      content,
+      []
+    );
+
+    // Send help message
+    bot.sendMessage(chatId, message, options);
   });
 
   console.log("Telegram bot started successfully");
