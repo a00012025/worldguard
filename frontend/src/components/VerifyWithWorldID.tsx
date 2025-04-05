@@ -14,7 +14,7 @@ const VerifyWithWorldID = ({
   onError,
 }: VerifyWithWorldIDProps) => {
   const [isVerifying, setIsVerifying] = useState(false);
-  const [apiStatus, setApiStatus] = useState<string>("");
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   const handleVerify = async () => {
     if (!MiniKit.isInstalled()) {
@@ -24,7 +24,6 @@ const VerifyWithWorldID = ({
 
     try {
       setIsVerifying(true);
-      setApiStatus("Verifying with World App...");
 
       const verifyPayload: VerifyCommandInput = {
         action: "worldguard-verification",
@@ -38,21 +37,23 @@ const VerifyWithWorldID = ({
         throw new Error(`Error from World App: ${JSON.stringify(finalPayload)}`);
       }
 
-      setApiStatus(`Submitting verification to API... ${JSON.stringify(finalPayload)} ${signal}`);
       await submitVerification(
         JSON.stringify(finalPayload),
         "worldguard-verification",
         signal
       );
-      setApiStatus("API verification successful!");
 
+      setShowSuccessDialog(true);
       onSuccess?.();
     } catch (error) {
-      setApiStatus(`Error: ${error instanceof Error ? error.message : String(error)}`);
       onError?.(error);
     } finally {
       setIsVerifying(false);
     }
+  };
+
+  const handleReturnToTelegram = () => {
+    window.location.href = "https://t.me/worldguardtesting";
   };
 
   return (
@@ -69,9 +70,18 @@ const VerifyWithWorldID = ({
         {isVerifying ? "Verifying..." : "Verify with World ID"}
       </button>
 
-      {apiStatus && (
-        <div className="mt-4 p-3 bg-gray-100 rounded-md">
-          <p className="text-sm">API Status: {apiStatus}</p>
+      {showSuccessDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4">Verification successful!</h2>
+            <p className="mb-6">You have successfully verified with World ID.</p>
+            <button
+              onClick={handleReturnToTelegram}
+              className="w-full px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all font-medium"
+            >
+              Return to Telegram
+            </button>
+          </div>
         </div>
       )}
     </div>
