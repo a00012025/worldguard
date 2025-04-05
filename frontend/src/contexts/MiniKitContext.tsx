@@ -5,7 +5,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import { IDKitWidget } from "@worldcoin/idkit";
 import type { ISuccessResult } from "@worldcoin/idkit";
 import { useVerification } from "./VerificationContext";
 

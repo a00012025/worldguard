@@ -87,9 +87,9 @@ export default function VerificationPage() {
                         action="telegram-verification"
                         signal={telegramId}
                         onSuccess={handleVerify}
-                        handleVerify={async (proof) => {
+                        handleVerify={async () => {
                           // This is handled by our context
-                          return true;
+                          return Promise.resolve();
                         }}
                       >
                         {({ open }) => (
