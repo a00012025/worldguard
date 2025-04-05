@@ -25,6 +25,7 @@ export function startBot() {
 
   // Handle when a new member joins the chat
   bot.on("new_chat_members", async (msg) => {
+    // console.log("new_chat_members", msg);
     const chatId = msg.chat.id;
 
     // Process each new member
@@ -107,6 +108,8 @@ export function startBot() {
   // Handle when a user leaves the chat
   bot.on("left_chat_member", (msg) => {
     const chatId = msg.chat.id;
+    console.log("left_chat_member", msg);
+
     // Check if left_chat_member exists
     if (!msg.left_chat_member) return;
     const userId = msg.left_chat_member.id;
@@ -122,6 +125,8 @@ export function startBot() {
     const fromId = msg.from?.id;
     const chatId = parseInt(match[1], 10);
     const userId = parseInt(match[2], 10);
+
+    console.log("start verify!", msg, match);
 
     // Ensure the user starting the bot is the same one being verified
     if (fromId !== userId) {
