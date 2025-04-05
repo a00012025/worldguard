@@ -46,7 +46,10 @@ const HomePage = () => {
         <h2 className="text-2xl font-semibold mb-10 text-center text-black">Key Features</h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           <div className="p-6 rounded-lg border border-slate-200 bg-white hover:shadow-sm transition-all">
-            <h3 className="text-lg font-medium text-black mb-2">Spam Protection</h3>
+            <div className="flex items-center mb-3">
+              <span className="text-2xl mr-2">🛡️</span>
+              <h3 className="text-lg font-medium text-black">Spam Protection</h3>
+            </div>
             <p className="text-slate-600 text-sm leading-relaxed">
               Keep your Telegram groups free of spam and bot accounts by requiring
               human verification through World ID.
@@ -54,7 +57,10 @@ const HomePage = () => {
           </div>
 
           <div className="p-6 rounded-lg border border-slate-200 bg-white hover:shadow-sm transition-all">
-            <h3 className="text-lg font-medium text-black mb-2">Privacy First</h3>
+            <div className="flex items-center mb-3">
+              <span className="text-2xl mr-2">🔒</span>
+              <h3 className="text-lg font-medium text-black">Privacy First</h3>
+            </div>
             <p className="text-slate-600 text-sm leading-relaxed">
               World ID's zero-knowledge proofs allow verification without
               revealing personal information.
@@ -62,7 +68,10 @@ const HomePage = () => {
           </div>
 
           <div className="p-6 rounded-lg border border-slate-200 bg-white hover:shadow-sm transition-all">
-            <h3 className="text-lg font-medium text-black mb-2">Easy Setup</h3>
+            <div className="flex items-center mb-3">
+              <span className="text-2xl mr-2">🚀</span>
+              <h3 className="text-lg font-medium text-black">Easy Setup</h3>
+            </div>
             <p className="text-slate-600 text-sm leading-relaxed">
               Add the WorldGuard bot to your Telegram group, and it will handle
               verification for all new members automatically.
