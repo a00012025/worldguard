@@ -3,15 +3,13 @@ import { useState } from "react";
 import { submitVerification } from "../services/api";
 
 interface VerifyWithWorldIDProps {
-  telegramUserId: string;
-  telegramChatId: string;
+  signal: string;
   onSuccess?: () => void;
   onError?: (error: unknown) => void;
 }
 
 const VerifyWithWorldID = ({
-  telegramUserId,
-  telegramChatId,
+  signal,
   onSuccess,
   onError,
 }: VerifyWithWorldIDProps) => {
@@ -21,7 +19,7 @@ const VerifyWithWorldID = ({
     try {
       setIsVerifying(true);
       const proofString = JSON.stringify(proof);
-      await submitVerification(proofString, telegramUserId, telegramChatId);
+      await submitVerification(proofString, "worldguard-verification", signal,);
       onSuccess?.();
     } catch (error) {
       onError?.(error);
@@ -33,16 +31,13 @@ const VerifyWithWorldID = ({
   return (
     <div className="verify-container">
       <p>
-        Your chat id: {telegramChatId}
-        <br />
-        Your user id: {telegramUserId}
+        Your signal: {signal}
       </p>
 
       <IDKitWidget
         app_id={import.meta.env.VITE_WORLD_APP_ID || ""}
-        action="telegram-verification"
-
-        signal={telegramUserId}
+        action="worldguard-verification"
+        signal={signal}
         onSuccess={handleVerify}
         handleVerify={() => Promise.resolve()}
       >

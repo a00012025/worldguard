@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_URL = "https://sensible-sparrow-admittedly.ngrok-free.app/api";
 
 /**
  * Axios instance with base configuration for API requests
@@ -19,15 +19,15 @@ const api = axios.create({
  * @param groupId The Telegram group ID (optional)
  */
 export const submitVerification = async (
-  proof: string,
-  telegramId: string,
-  groupId?: string
+  payload: string,
+  action: string,
+  signal: string
 ) => {
   try {
     const response = await api.post("/verify", {
-      proof,
-      telegramId,
-      groupId,
+      payload,
+      action,
+      signal,
     });
     return response.data;
   } catch (error) {

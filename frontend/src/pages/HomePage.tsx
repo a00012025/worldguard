@@ -2,16 +2,12 @@ import { useEffect, useState } from "react";
 import VerifyWithWorldID from "../components/VerifyWithWorldID";
 
 const HomePage = () => {
-  const [telegramUserId, setTelegramUserId] = useState<string>("");
-  const [telegramChatId, setTelegramChatId] = useState<string>("");
+  const [signal, setSignal] = useState<string>("");
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const userId = urlParams.get("userId") || "";
-    const chatId = urlParams.get("chatId") || "";
-
-    setTelegramUserId(userId);
-    setTelegramChatId(chatId);
+    const newSignal = urlParams.get("signal") || "";
+    setSignal(newSignal);
   }, []);
 
   return (
@@ -26,8 +22,7 @@ const HomePage = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
 
           <VerifyWithWorldID
-            telegramUserId={telegramUserId}
-            telegramChatId={telegramChatId}
+            signal={signal}
           />
 
           <a

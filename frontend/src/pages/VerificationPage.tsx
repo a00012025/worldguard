@@ -1,8 +1,8 @@
-import { useEffect } from "react";
 import { IDKitWidget } from "@worldcoin/idkit";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { useVerification } from "../contexts/VerificationContext";
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMiniKit } from "../contexts/MiniKitContext";
+import { useVerification } from "../contexts/VerificationContext";
 
 export default function VerificationPage() {
   const [searchParams] = useSearchParams();
@@ -84,7 +84,7 @@ export default function VerificationPage() {
                     <div className="world-id-button">
                       <IDKitWidget
                         app_id={import.meta.env.VITE_WORLD_APP_ID || ""}
-                        action="telegram-verification"
+                        action="worldguard-verification"
                         signal={telegramId}
                         onSuccess={handleVerify}
                         handleVerify={async () => {
