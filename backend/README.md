@@ -43,7 +43,7 @@ TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
 WORLD_APP_ID=app_your_world_app_id_here
 PORT=3000
 HOST=localhost
-VERIFICATION_TIMEOUT_MS=60000
+VERIFICATION_TIMEOUT_MS=180000
 ```
 
 5. Build the project:
