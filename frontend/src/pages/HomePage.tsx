@@ -37,7 +37,7 @@ const HomePage = () => {
           />
 
           <a
-            href="https://t.me/worldguard_bot"
+            href="https://t.me/world_guard_bot"
             target="_blank"
             rel="noreferrer"
             className="px-6 py-3 bg-white text-black rounded-md border border-slate-200 hover:bg-slate-50 transition-all font-medium"
