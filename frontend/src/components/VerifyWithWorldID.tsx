@@ -14,6 +14,7 @@ const VerifyWithWorldID = ({
   onError,
 }: VerifyWithWorldIDProps) => {
   const [isVerifying, setIsVerifying] = useState(false);
+  const [apiStatus, setApiStatus] = useState<string>("");
 
   const handleVerify = async () => {
     if (!MiniKit.isInstalled()) {
@@ -23,6 +24,7 @@ const VerifyWithWorldID = ({
 
     try {
       setIsVerifying(true);
+      setApiStatus("Verifying with World App...");
 
       const verifyPayload: VerifyCommandInput = {
         action: "worldguard-verification",
@@ -36,14 +38,17 @@ const VerifyWithWorldID = ({
         throw new Error(`Error from World App: ${JSON.stringify(finalPayload)}`);
       }
 
+      setApiStatus(`Submitting verification to API... ${JSON.stringify(finalPayload)} ${signal}`);
       await submitVerification(
         JSON.stringify(finalPayload),
         "worldguard-verification",
         signal
       );
+      setApiStatus("API verification successful!");
 
       onSuccess?.();
     } catch (error) {
+      setApiStatus(`Error: ${error instanceof Error ? error.message : String(error)}`);
       onError?.(error);
     } finally {
       setIsVerifying(false);
@@ -63,6 +68,12 @@ const VerifyWithWorldID = ({
       >
         {isVerifying ? "Verifying..." : "Verify with World ID"}
       </button>
+
+      {apiStatus && (
+        <div className="mt-4 p-3 bg-gray-100 rounded-md">
+          <p className="text-sm">API Status: {apiStatus}</p>
+        </div>
+      )}
     </div>
   );
 };
