@@ -1,4 +1,4 @@
-import { IDKitWidget } from "@worldcoin/idkit";
+import { IDKitWidget, VerificationLevel } from "@worldcoin/idkit";
 import { useState } from "react";
 import { submitVerification } from "../services/api";
 
@@ -35,11 +35,11 @@ const VerifyWithWorldID = ({
       </p>
 
       <IDKitWidget
-        app_id={import.meta.env.VITE_WORLD_APP_ID || ""}
+        app_id={"app_e9ff38ec52182a86a2101509db66c179"}
         action="worldguard-verification"
         signal={signal}
         onSuccess={handleVerify}
-        handleVerify={() => Promise.resolve()}
+        verification_level={VerificationLevel.Device}
       >
         {({ open }) => (
           <button
