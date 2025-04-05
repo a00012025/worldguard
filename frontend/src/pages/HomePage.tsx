@@ -1,5 +1,19 @@
+import { useEffect, useState } from "react";
+import VerifyWithWorldID from "../components/VerifyWithWorldID";
 
 const HomePage = () => {
+  const [telegramUserId, setTelegramUserId] = useState<string>("");
+  const [telegramChatId, setTelegramChatId] = useState<string>("");
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get("userId") || "";
+    const chatId = urlParams.get("chatId") || "";
+
+    setTelegramUserId(userId);
+    setTelegramChatId(chatId);
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-slate-900">
       {/* Hero Section */}
@@ -10,12 +24,11 @@ const HomePage = () => {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-          <a
-            href="#verify"
-            className="px-6 py-3 bg-black text-white rounded-md hover:bg-black/90 transition-all font-medium"
-          >
-            Verify with World ID
-          </a>
+
+          <VerifyWithWorldID
+            telegramUserId={telegramUserId}
+            telegramChatId={telegramChatId}
+          />
 
           <a
             href="https://t.me/worldguard_bot"

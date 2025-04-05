@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { IDKitWidget } from "@worldcoin/idkit";
+import { useState } from "react";
 import { submitVerification } from "../services/api";
 
 interface VerifyWithWorldIDProps {
@@ -33,12 +33,15 @@ const VerifyWithWorldID = ({
   return (
     <div className="verify-container">
       <p>
-        Please verify your World ID to continue. This is a one-time process and
-        helps us prevent spam.
+        Your chat id: {telegramChatId}
+        <br />
+        Your user id: {telegramUserId}
       </p>
+
       <IDKitWidget
         app_id={import.meta.env.VITE_WORLD_APP_ID || ""}
         action="telegram-verification"
+
         signal={telegramUserId}
         onSuccess={handleVerify}
         handleVerify={() => Promise.resolve()}
@@ -46,7 +49,7 @@ const VerifyWithWorldID = ({
         {({ open }) => (
           <button
             onClick={open}
-            className="button primary"
+            className="w-full px-6 py-3 bg-black text-white rounded-md hover:bg-black/90 transition-all font-medium"
             disabled={isVerifying}
           >
             {isVerifying ? "Verifying..." : "Verify with World ID"}
