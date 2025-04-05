@@ -19,7 +19,9 @@ const HomePage = () => {
     <div className="min-h-screen flex flex-col bg-white text-slate-900">
       {/* Hero Section */}
       <div className="py-24 px-4 text-center space-y-6 max-w-4xl mx-auto">
-        <h1 className="text-5xl font-bold tracking-tight text-black">World Guard</h1>
+        <h1 className="text-5xl font-bold tracking-tight text-black">
+          World Guard
+        </h1>
         <p className="text-sm text-slate-600 max-w-md mx-auto">
           Secure your Telegram groups with World ID verification
         </p>
@@ -28,13 +30,8 @@ const HomePage = () => {
           <img src={logo} alt="WorldGuard" className="w-40 h-40" />
         </div>
 
-
-
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-
-          <VerifyWithWorldID
-            signal={signal}
-          />
+          <VerifyWithWorldID signal={signal} />
 
           <a
             href="https://t.me/world_guard_bot"
@@ -50,16 +47,20 @@ const HomePage = () => {
       {/* Features Section */}
       {/* Features Section */}
       <div className="px-4 py-16 max-w-5xl mx-auto w-full">
-        <h2 className="text-2xl font-semibold mb-10 text-center text-black">Key Features</h2>
+        <h2 className="text-2xl font-semibold mb-10 text-center text-black">
+          Key Features
+        </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           <div className="p-6 rounded-lg border border-slate-200 bg-white hover:shadow-sm transition-all">
             <div className="flex items-center mb-3">
               <img src={shield} alt="Shield" className="w-10 h-10 mr-2" />
-              <h3 className="text-lg font-medium text-black">Spam Protection</h3>
+              <h3 className="text-lg font-medium text-black">
+                Spam Protection
+              </h3>
             </div>
             <p className="text-slate-600 text-sm leading-relaxed">
-              Keep your Telegram groups free of spam and bot accounts by requiring
-              human verification through World ID.
+              Keep your Telegram groups free of spam and bot accounts by
+              requiring human verification through World ID.
             </p>
           </div>
 
@@ -90,11 +91,18 @@ const HomePage = () => {
         <footer className="py-6 text-center text-slate-500 border-t border-slate-100">
           <p className="text-sm">
             Powered by{" "}
-            <a href="https://worldcoin.org/" target="_blank" rel="noreferrer" className="text-black hover:underline">
+            <a
+              href="https://worldcoin.org/"
+              target="_blank"
+              rel="noreferrer"
+              className="text-black hover:underline"
+            >
               World ID
             </a>
             {" · "}
-            <span className="text-slate-400">v0.0.1 {MiniKit.isInstalled() ? "Installed" : "Not Installed"}</span>
+            <span className="text-slate-400">
+              v0.0.1 {MiniKit.isInstalled() ? "Installed" : "Not Installed"}
+            </span>
           </p>
         </footer>
       </div>
