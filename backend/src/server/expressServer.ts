@@ -5,11 +5,20 @@ import {
   ISuccessResult,
 } from "@worldcoin/minikit-js";
 import { markUserAsVerified } from "../bot/telegramBot";
+import cors from "cors";
 
 const app = express();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+// Enable CORS for all origins
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // Create and start the server
 export function startServer(port: number) {
@@ -26,9 +35,9 @@ export function startServer(port: number) {
 
   // Endpoint to verify World ID proof
   app.post("/api/verify", function (req, res) {
-    const { payload, action, signal } = req.body;
+    // console.log("Received verification request:", req.body);
 
-    console.log("Received verification request:", req.body);
+    const { payload, action, signal } = req.body;
 
     if (!payload || !action || !signal) {
       return res.status(400).json({
@@ -59,7 +68,12 @@ export function startServer(port: number) {
 
     // Verify the proof with World ID
     const app_id = process.env.WORLD_APP_ID as `app_${string}`;
-    verifyCloudProof(payload as ISuccessResult, app_id, actionId, signal)
+    verifyCloudProof(
+      JSON.parse(payload) as ISuccessResult,
+      app_id,
+      actionId,
+      signal
+    )
       .then((verifyRes: IVerifyResponse) => {
         if (verifyRes.success) {
           console.log(
@@ -90,6 +104,7 @@ export function startServer(port: number) {
             });
         } else {
           console.error(`Verification failed for user ${userId}:`, verifyRes);
+
           return res.status(400).json({
             success: false,
             error: "Verification failed",
