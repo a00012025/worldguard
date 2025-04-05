@@ -1,5 +1,6 @@
 import { MiniKit } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
+import logo from "../assets/cool.png";
 import VerifyWithWorldID from "../components/VerifyWithWorldID";
 
 const HomePage = () => {
@@ -15,10 +16,16 @@ const HomePage = () => {
     <div className="min-h-screen flex flex-col bg-white text-slate-900">
       {/* Hero Section */}
       <div className="py-24 px-4 text-center space-y-6 max-w-4xl mx-auto">
-        <h1 className="text-5xl font-bold tracking-tight text-black">WorldGuard</h1>
-        <p className="text-lg text-slate-600 max-w-md mx-auto">
+        <h1 className="text-5xl font-bold tracking-tight text-black">World Guard</h1>
+        <p className="text-sm text-slate-600 max-w-md mx-auto">
           Secure your Telegram groups with World ID verification
         </p>
+
+        <div className="flex justify-center">
+          <img src={logo} alt="WorldGuard" className="w-40 h-40" />
+        </div>
+
+
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
 

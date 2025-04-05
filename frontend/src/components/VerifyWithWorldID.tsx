@@ -58,9 +58,6 @@ const VerifyWithWorldID = ({
 
   return (
     <div className="verify-container">
-      <p>
-        Your signal: {signal}
-      </p>
 
       <button
         onClick={handleVerify}
