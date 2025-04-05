@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { MiniKit, VerificationLevel } from "@worldcoin/minikit-js";
 import {
-  ReactNode,
-  useEffect,
   createContext,
+  ReactNode,
   useContext,
+  useEffect,
   useState,
 } from "react";
-import { MiniKit, VerificationLevel } from "@worldcoin/minikit-js";
 
 // Define the context type
 type MiniKitContextType = {
@@ -33,7 +33,7 @@ export default function MiniKitProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Initialize MiniKit
     try {
-      MiniKit.install();
+      MiniKit.install("app_e9ff38ec52182a86a2101509db66c179");
       setIsInstalled(MiniKit.isInstalled());
     } catch (error) {
       console.error("Error installing MiniKit:", error);

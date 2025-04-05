@@ -1,11 +1,12 @@
+import type { ISuccessResult } from "@worldcoin/idkit";
+import { MiniKit } from "@worldcoin/minikit-js";
 import {
   createContext,
-  useContext,
   ReactNode,
+  useContext,
   useEffect,
   useState,
 } from "react";
-import type { ISuccessResult } from "@worldcoin/idkit";
 import { useVerification } from "./VerificationContext";
 
 interface MiniKitContextType {
@@ -32,8 +33,15 @@ export function MiniKitProvider({ children }: MiniKitProviderProps) {
   const { completeVerification } = useVerification();
 
   useEffect(() => {
-    // Initialize World ID Mini App
-    setIsReady(true);
+    // Initialize MiniKit
+    try {
+      MiniKit.install("app_e9ff38ec52182a86a2101509db66c179");
+      setIsReady(MiniKit.isInstalled());
+    } catch (error) {
+      console.error("Error installing MiniKit:", error);
+    } finally {
+      setIsReady(false);
+    }
   }, []);
 
   const handleVerify = async (result: ISuccessResult) => {
