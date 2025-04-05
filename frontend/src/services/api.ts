@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://sensible-sparrow-admittedly.ngrok-free.app/api";
+const API_URL = "https://worldguard-production.up.railway.app/api";
 
 /**
  * Axios instance with base configuration for API requests
