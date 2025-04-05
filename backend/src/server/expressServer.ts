@@ -26,27 +26,29 @@ export function startServer(port: number) {
 
   // Endpoint to verify World ID proof
   app.post("/api/verify", function (req, res) {
-    const { payload, action, signal, chatId } = req.body;
+    const { payload, action, signal } = req.body;
 
-    if (!payload || !action || !signal || !chatId) {
+    if (!payload || !action || !signal) {
       return res.status(400).json({
         success: false,
         error: "Missing required parameters",
       });
     }
 
+    // signal is userId_chatId
+    const [userIdString, chatIdString] = signal.split("_");
+    const userId = parseInt(userIdString, 10);
+    const chatId = parseInt(chatIdString, 10);
+
     console.log(
-      `Received verification request for user ${signal} in chat ${chatId}`
+      `Received verification request for user ${userId} in chat ${chatId}`
     );
 
     // The action ID you configured in World ID Developer Portal
     const actionId = action || "worldguard-verification";
 
     // Convert the string signal to integer for the Telegram user ID
-    const userId = parseInt(signal, 10);
-    const groupChatId = parseInt(chatId, 10);
-
-    if (isNaN(userId) || isNaN(groupChatId)) {
+    if (isNaN(userId) || isNaN(chatId)) {
       return res.status(400).json({
         success: false,
         error: "Invalid userId or chatId",
@@ -59,11 +61,11 @@ export function startServer(port: number) {
       .then((verifyRes: IVerifyResponse) => {
         if (verifyRes.success) {
           console.log(
-            `Verification successful for user ${userId} in chat ${groupChatId}`
+            `Verification successful for user ${userId} in chat ${chatId}`
           );
 
           // Mark the user as verified in the bot
-          markUserAsVerified(groupChatId, userId)
+          markUserAsVerified(chatId, userId)
             .then((success) => {
               if (success) {
                 return res.status(200).json({
