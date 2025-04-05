@@ -1,6 +1,9 @@
 import { MiniKit } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
 import logo from "../assets/cool.png";
+import locker from "../assets/locker.png";
+import rocket from "../assets/rocket.png";
+import shield from "../assets/shield.png";
 import VerifyWithWorldID from "../components/VerifyWithWorldID";
 
 const HomePage = () => {
@@ -45,12 +48,13 @@ const HomePage = () => {
       </div>
 
       {/* Features Section */}
+      {/* Features Section */}
       <div className="px-4 py-16 max-w-5xl mx-auto w-full">
         <h2 className="text-2xl font-semibold mb-10 text-center text-black">Key Features</h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           <div className="p-6 rounded-lg border border-slate-200 bg-white hover:shadow-sm transition-all">
             <div className="flex items-center mb-3">
-              <span className="text-2xl mr-2">🛡️</span>
+              <img src={shield} alt="Shield" className="w-10 h-10 mr-2" />
               <h3 className="text-lg font-medium text-black">Spam Protection</h3>
             </div>
             <p className="text-slate-600 text-sm leading-relaxed">
@@ -61,7 +65,7 @@ const HomePage = () => {
 
           <div className="p-6 rounded-lg border border-slate-200 bg-white hover:shadow-sm transition-all">
             <div className="flex items-center mb-3">
-              <span className="text-2xl mr-2">🔒</span>
+              <img src={locker} alt="Locker" className="w-10 h-10 mr-2" />
               <h3 className="text-lg font-medium text-black">Privacy First</h3>
             </div>
             <p className="text-slate-600 text-sm leading-relaxed">
@@ -72,7 +76,7 @@ const HomePage = () => {
 
           <div className="p-6 rounded-lg border border-slate-200 bg-white hover:shadow-sm transition-all">
             <div className="flex items-center mb-3">
-              <span className="text-2xl mr-2">🚀</span>
+              <img src={rocket} alt="Rocket" className="w-10 h-10 mr-2" />
               <h3 className="text-lg font-medium text-black">Easy Setup</h3>
             </div>
             <p className="text-slate-600 text-sm leading-relaxed">
@@ -82,7 +86,6 @@ const HomePage = () => {
           </div>
         </div>
       </div>
-
       <div className="mt-auto">
         <footer className="py-6 text-center text-slate-500 border-t border-slate-100">
           <p className="text-sm">
