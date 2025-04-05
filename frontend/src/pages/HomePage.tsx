@@ -1,3 +1,4 @@
+import { MiniKit } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
 import VerifyWithWorldID from "../components/VerifyWithWorldID";
 
@@ -83,7 +84,7 @@ const HomePage = () => {
               World ID
             </a>
             {" · "}
-            <span className="text-slate-400">v0.0.1</span>
+            <span className="text-slate-400">v0.0.1 {MiniKit.isInstalled() ? "Installed" : "Not Installed"}</span>
           </p>
         </footer>
       </div>
