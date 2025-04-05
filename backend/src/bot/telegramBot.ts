@@ -6,7 +6,7 @@ const token = process.env.TELEGRAM_BOT_TOKEN || "";
 
 // Verification timeout in milliseconds (default: 5 minutes)
 const VERIFICATION_TIMEOUT_MS = parseInt(
-  process.env.VERIFICATION_TIMEOUT_MS || "300000",
+  process.env.VERIFICATION_TIMEOUT_MS || "60000",
   10
 );
 
@@ -74,10 +74,9 @@ export function startBot() {
                       const signal = `${userId}_${chatId}`;
 
                       // Create a path with all parameters
-                      let path = `?action=worldguard-verification&signal=${signal}&redirect_url=${encodeURIComponent(
-                        `https://t.me/world_guard_bot?start=verify_${chatId}_${userId}`
-                      )}`;
-
+                      let path = `?action=worldguard-verification&signal=${signal}`;
+                      // redirect_url: https://t.me/world_guard_bot?start=verify_1234567890_987654321
+                      // ?action=worldguard-verification&signal=1234567890_987654321
                       // Encode the entire path
                       const encodedPath = encodeURIComponent(path);
 
