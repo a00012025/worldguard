@@ -6,7 +6,7 @@ const token = process.env.TELEGRAM_BOT_TOKEN || "";
 
 // Verification timeout in milliseconds (default: 5 minutes)
 const VERIFICATION_TIMEOUT_MS = parseInt(
-  process.env.VERIFICATION_TIMEOUT_MS || "60000",
+  process.env.VERIFICATION_TIMEOUT_MS || "180000",
   10
 );
 
@@ -115,7 +115,7 @@ export function startBot() {
   // Handle when a user leaves the chat
   bot.on("left_chat_member", (msg) => {
     const chatId = msg.chat.id;
-    console.log("left_chat_member", msg);
+    // console.log("left_chat_member", msg);
 
     // Check if left_chat_member exists
     if (!msg.left_chat_member) return;
@@ -182,9 +182,22 @@ async function handleVerificationTimeout(chatId: number, userId: number) {
     }
 
     // Kick user from the group (using banChatMember which replaced kickChatMember)
-    await bot.banChatMember(chatId, userId, {
-      until_date: Math.floor(Date.now() / 1000) + 30, // Ban for 30 seconds
-    });
+    try {
+      // Set to 31 seconds to avoid the "less than 30 seconds" case that causes permanent bans
+      const unbanDate = Math.floor(Date.now() / 1000) + 40;
+
+      await bot.banChatMember(chatId, userId, {
+        until_date: unbanDate, // Ban for 31 seconds (must be > 30 to not be permanent)
+      });
+
+      console.log(
+        `User ${userId} banned until ${new Date(
+          unbanDate * 1000
+        ).toISOString()}`
+      );
+    } catch (error) {
+      console.error(`Failed to ban user ${userId} from chat ${chatId}:`, error);
+    }
 
     // Clean up verification state
     stateManager.removeUserVerification(chatId, userId);
