@@ -4,8 +4,4 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [tailwindcss(), react()],
-  server: {
-    historyApiFallback: true,
-  },
-  base: "/",
 });
