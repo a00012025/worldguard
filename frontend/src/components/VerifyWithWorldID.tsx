@@ -53,7 +53,7 @@ const VerifyWithWorldID = ({
   };
 
   const handleReturnToTelegram = () => {
-    window.location.href = "https://t.me/worldguardtesting";
+    window.location.href = "https://t.me";
   };
 
   return (
