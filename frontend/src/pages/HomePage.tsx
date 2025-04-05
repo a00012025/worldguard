@@ -78,6 +78,8 @@ const HomePage = () => {
             <a href="https://worldcoin.org/" target="_blank" rel="noreferrer" className="text-black hover:underline">
               World ID
             </a>
+            {" · "}
+            <span className="text-slate-400">v0.0.1</span>
           </p>
         </footer>
       </div>
