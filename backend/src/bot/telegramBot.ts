@@ -22,10 +22,14 @@ const bot = new TelegramBot(token, {
         "callback_query",
         "my_chat_member",
         "chat_member",
+        "chat_join_request",
       ],
     },
   },
 });
+
+// Store bot ID for later use
+let botId: number;
 
 /**
  * Helper function to format bot messages with consistent styling
@@ -51,6 +55,84 @@ const formatBotMessage = (
 };
 
 /**
+ * Handle the process for a new member joining a chat
+ */
+async function handleNewMember(
+  chatId: number,
+  userId: number,
+  username?: string
+) {
+  console.log(`Processing new member: ${username || userId} in chat ${chatId}`);
+
+  try {
+    // Restrict user from sending messages initially
+    await bot.restrictChatMember(chatId, userId, {
+      can_send_messages: false,
+      can_send_photos: false,
+      can_send_videos: false,
+      can_send_audios: false,
+      can_send_voice_notes: false,
+      can_send_documents: false,
+      can_send_polls: false,
+      can_send_other_messages: false,
+      can_add_web_page_previews: false,
+    });
+
+    // Add user to verification queue
+    stateManager.addUserToVerification(chatId, userId, username);
+
+    // Format welcome message with more information
+    const verificationContent =
+      `Welcome @${username || userId}!\n\n` +
+      "To prevent spam, please verify you're human using World ID.\n\n" +
+      "World ID is a digital passport that protects groups from bots while preserving your privacy. " +
+      "The verification takes just a few seconds.";
+
+    const verificationButtons = [
+      [
+        {
+          text: "🌎 Verify with World ID",
+          url: (() => {
+            // Create the signal in the requested format
+            const signal = `${userId}_${chatId}`;
+
+            // Create a path with all parameters
+            let path = `?action=worldguard-verification&signal=${signal}`;
+            // Encode the entire path
+            const encodedPath = encodeURIComponent(path);
+
+            // Construct the final URL
+            return `https://worldcoin.org/mini-app?app_id=app_e9ff38ec52182a86a2101509db66c179&path=${encodedPath}`;
+          })(),
+        },
+      ],
+    ];
+
+    // Send verification message with button
+    const message = await bot.sendMessage(chatId, verificationContent, {
+      reply_markup: {
+        inline_keyboard: verificationButtons,
+      },
+    });
+
+    // Store verification message ID for later cleanup
+    stateManager.setVerificationMessageId(chatId, userId, message.message_id);
+
+    // Set timeout to kick user if not verified in time
+    const timerId = setTimeout(
+      () => handleVerificationTimeout(chatId, userId),
+      VERIFICATION_TIMEOUT_MS
+    );
+    stateManager.setVerificationTimer(chatId, userId, timerId);
+  } catch (error) {
+    console.error(
+      `Error handling new member ${userId} in chat ${chatId}:`,
+      error
+    );
+  }
+}
+
+/**
  * Initialize the Telegram bot
  */
 export function startBot() {
@@ -59,6 +141,12 @@ export function startBot() {
   }
 
   console.log("Starting Telegram bot...");
+
+  // Get bot info to store its ID
+  bot.getMe().then((botInfo) => {
+    botId = botInfo.id;
+    console.log(`Bot initialized with ID: ${botId}`);
+  });
 
   // Set up bot commands menu
   bot
@@ -76,9 +164,8 @@ export function startBot() {
       console.error("Error setting up bot commands menu:", error);
     });
 
-  // Handle when a new member joins the chat
+  // Handle when a new member joins the chat (via new_chat_members event)
   bot.on("new_chat_members", async (msg) => {
-    // console.log("new_chat_members", msg);
     const chatId = msg.chat.id;
 
     // Process each new member
@@ -91,78 +178,42 @@ export function startBot() {
       const userId = user.id;
       const username = user.username;
 
-      console.log(`New user joined: ${username}, ${userId} in chat ${chatId}`);
+      console.log(
+        `New user joined via new_chat_members: ${username}, ${userId} in chat ${chatId}`
+      );
 
-      try {
-        // Restrict user from sending messages initially
-        await bot.restrictChatMember(chatId, userId, {
-          can_send_messages: false,
-          can_send_photos: false,
-          can_send_videos: false,
-          can_send_audios: false,
-          can_send_voice_notes: false,
-          can_send_documents: false,
-          can_send_polls: false,
-          can_send_other_messages: false,
-          can_add_web_page_previews: false,
-        });
+      // Use the extracted function to handle the new member
+      await handleNewMember(chatId, userId, username);
+    }
+  });
 
-        // Add user to verification queue
-        stateManager.addUserToVerification(chatId, userId, username);
+  // Handle when a chat member's status changes (including when they join)
+  bot.on("chat_member", async (chatMemberUpdate) => {
+    console.log("Chat member status updated:", chatMemberUpdate);
 
-        // Format welcome message with more information
-        const verificationContent =
-          `Welcome @${username || userId}!\n\n` +
-          "To prevent spam, please verify you're human using World ID.\n\n" +
-          "World ID is a digital passport that protects groups from bots while preserving your privacy. " +
-          "The verification takes just a few seconds.";
+    // Check if this is a new member joining (status changed to 'member')
+    if (
+      chatMemberUpdate.old_chat_member.status !== "member" &&
+      chatMemberUpdate.new_chat_member.status === "member"
+    ) {
+      const userId = chatMemberUpdate.new_chat_member.user.id;
+      const chatId = chatMemberUpdate.chat.id;
+      const username = chatMemberUpdate.new_chat_member.user.username;
 
-        const verificationButtons = [
-          [
-            {
-              text: "🌎 Verify with World ID",
-              url: (() => {
-                // Create the signal in the requested format
-                const signal = `${userId}_${chatId}`;
+      console.log(
+        `User joined via chat_member event: ${
+          username || userId
+        } in chat ${chatId}`
+      );
 
-                // Create a path with all parameters
-                let path = `?action=worldguard-verification&signal=${signal}`;
-                // Encode the entire path
-                const encodedPath = encodeURIComponent(path);
-
-                // Construct the final URL
-                return `https://worldcoin.org/mini-app?app_id=app_e9ff38ec52182a86a2101509db66c179&path=${encodedPath}`;
-              })(),
-            },
-          ],
-        ];
-
-        // Send verification message with button
-        const message = await bot.sendMessage(chatId, verificationContent, {
-          reply_markup: {
-            inline_keyboard: verificationButtons,
-          },
-        });
-
-        // Store verification message ID for later cleanup
-        stateManager.setVerificationMessageId(
-          chatId,
-          userId,
-          message.message_id
-        );
-
-        // Set timeout to kick user if not verified in time
-        const timerId = setTimeout(
-          () => handleVerificationTimeout(chatId, userId),
-          VERIFICATION_TIMEOUT_MS
-        );
-        stateManager.setVerificationTimer(chatId, userId, timerId);
-      } catch (error) {
-        console.error(
-          `Error handling new member ${userId} in chat ${chatId}:`,
-          error
-        );
+      // Skip if it's the bot itself
+      if (userId === botId) {
+        console.log(`Skipping verification for bot itself (ID: ${botId})`);
+        return;
       }
+
+      // Use the extracted function to handle the new member
+      await handleNewMember(chatId, userId, username);
     }
   });
 
@@ -272,6 +323,21 @@ export function startBot() {
 
     // Send help message
     bot.sendMessage(chatId, message, options);
+  });
+
+  // Handle when the bot is added to a group or its status changes
+  bot.on("my_chat_member", async (msg) => {
+    console.log("Bot's chat member status changed:", msg);
+
+    // Check if the bot was just added to a group
+    if (
+      msg.new_chat_member &&
+      msg.new_chat_member.user.id === botId &&
+      ["administrator", "member"].includes(msg.new_chat_member.status)
+    ) {
+      console.log(`Bot was added to chat ${msg.chat.id}`);
+      // Add any initialization code for the bot in this group
+    }
   });
 
   console.log("Telegram bot started successfully");
