@@ -64,19 +64,59 @@ async function handleNewMember(
 ) {
   console.log(`Processing new member: ${username || userId} in chat ${chatId}`);
 
+  // Check if user is already in verification process to prevent duplicate processing
+  const existingVerification = stateManager.getUserVerification(chatId, userId);
+  if (existingVerification) {
+    console.log(
+      `User ${userId} in chat ${chatId} is already in verification process, skipping`
+    );
+    return;
+  }
+
   try {
+    // Check bot permissions first
+    try {
+      const chatMember = await bot.getChatMember(chatId, botId);
+      if (chatMember.status !== "administrator") {
+        console.warn(
+          `Bot is not an administrator in chat ${chatId}, cannot restrict members`
+        );
+        return;
+      }
+
+      // Check if bot has permission to restrict members
+      const botPermissions = chatMember as any;
+      if (!botPermissions.can_restrict_members) {
+        console.warn(
+          `Bot doesn't have permission to restrict members in chat ${chatId}`
+        );
+        return;
+      }
+    } catch (error) {
+      console.error(`Error checking bot permissions in chat ${chatId}:`, error);
+      return;
+    }
+
     // Restrict user from sending messages initially
-    await bot.restrictChatMember(chatId, userId, {
-      can_send_messages: false,
-      can_send_photos: false,
-      can_send_videos: false,
-      can_send_audios: false,
-      can_send_voice_notes: false,
-      can_send_documents: false,
-      can_send_polls: false,
-      can_send_other_messages: false,
-      can_add_web_page_previews: false,
-    });
+    try {
+      await bot.restrictChatMember(chatId, userId, {
+        can_send_messages: false,
+        can_send_photos: false,
+        can_send_videos: false,
+        can_send_audios: false,
+        can_send_voice_notes: false,
+        can_send_documents: false,
+        can_send_polls: false,
+        can_send_other_messages: false,
+        can_add_web_page_previews: false,
+      });
+    } catch (error) {
+      console.error(
+        `Failed to restrict user ${userId} in chat ${chatId}:`,
+        error
+      );
+      // Continue with verification process even if restriction fails
+    }
 
     // Add user to verification queue
     stateManager.addUserToVerification(chatId, userId, username);
@@ -109,14 +149,21 @@ async function handleNewMember(
     ];
 
     // Send verification message with button
-    const message = await bot.sendMessage(chatId, verificationContent, {
-      reply_markup: {
-        inline_keyboard: verificationButtons,
-      },
-    });
+    try {
+      const message = await bot.sendMessage(chatId, verificationContent, {
+        reply_markup: {
+          inline_keyboard: verificationButtons,
+        },
+      });
 
-    // Store verification message ID for later cleanup
-    stateManager.setVerificationMessageId(chatId, userId, message.message_id);
+      // Store verification message ID for later cleanup
+      stateManager.setVerificationMessageId(chatId, userId, message.message_id);
+    } catch (error) {
+      console.error(
+        `Failed to send verification message for user ${userId} in chat ${chatId}:`,
+        error
+      );
+    }
 
     // Set timeout to kick user if not verified in time
     const timerId = setTimeout(
@@ -327,7 +374,11 @@ export function startBot() {
 
   // Handle when the bot is added to a group or its status changes
   bot.on("my_chat_member", async (msg) => {
-    console.log("Bot's chat member status changed:", msg);
+    console.log(
+      "Bot's chat member status changed:",
+      msg.new_chat_member?.user?.id,
+      msg.new_chat_member?.status
+    );
 
     // Check if the bot was just added to a group
     if (
